@@ -246,6 +246,19 @@
            (doall (for [form forms]
                     (apply-transform (first transform-list) form))))))
 
+(defmacro defsnippet
+  [tmpl-name source arg-list & transforms]
+  (let [source (if (utils/code-form? source) ;; Need to force eval if source is
+                 (eval source)               ;; not hiccup vectors.
+                 source)
+        source-forms (map utils/normalize-form ;; ["tag" {attrs} content...]
+                          source)
+        transforms (partition 2 (map eval transforms))
+        transformed-forms (apply-transforms transforms source-forms)]
+    `(defn ~tmpl-name
+       ~arg-list
+       ~@transformed-forms)))
+
 (defmacro deftemplate
   [tmpl-name source arg-list & transforms]
   (let [source (if (utils/code-form? source) ;; Need to force eval if source is
@@ -270,7 +283,7 @@
   (let [html-string (if (string? string-or-reader)
                       string-or-reader
                       (slurp string-or-reader))]
-    (hickory/parse html-string)))
+    (hickory/as-hiccup (hickory/parse html-string))))
 
 (defn html-fragment
   "Parse an HTML fragment out of the argument given, which can be either a
@@ -279,7 +292,7 @@
   (let [html-string (if (string? string-or-reader)
                       string-or-reader
                       (slurp string-or-reader))]
-    (hickory/parse-fragment html-string)))
+    (map hickory/as-hiccup (hickory/parse-fragment html-string))))
 
 (defn hiccup-file
   "Parse hiccup forms out of the argument."
