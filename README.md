@@ -39,7 +39,8 @@ As the simplest possible example, consider
 		(:use tinsel.core))
 	
 	(deftemplate simple-template [[:h1 "Just a Simple Template"]]
-		[])
+		[]
+        [])
 
 This generates a function called simple-template, which can be called with no
 argument. When you call it, it returns the string
@@ -53,8 +54,8 @@ services the request.
 
 	(deftemplate welcome-template [[:h1#user-welcome]]
 		[user-name]
-		(id= :user-welcome)
-		(set-content (str "Welcome " user-name "!")))
+        [(id= :user-welcome)
+		 (set-content (str "Welcome " user-name "!"))])
 
 Which outputs
 
@@ -80,13 +81,13 @@ look at the template below:
 	     [:div.example]
 	     [:ul.times-table]]]]
 	  [text]
-	  (select (or-ancestor (tag= :head))
-	          (tag= :title))
-	  (set-content "Times Table for 9")
-	  (has-class? :example) (set-content text)
-	  (has-class? :times-table)
-	  (set-content (for [n (range 1 13)]
-	                 [:li n " * 9 = " (* n 9)])))
+      [(select (or-ancestor (tag= :head))
+   	          (tag= :title))
+	   (set-content "Times Table for 9")
+	   (has-class? :example) (set-content text)
+	   (has-class? :times-table)
+	   (set-content (for [n (range 1 13)]
+	                 [:li n " * 9 = " (* n 9)]))])
 
 Which outputs
 
@@ -121,8 +122,8 @@ value of either as the template argument to `deftemplate`:
 ```clojure
 (deftemplate html-template (html-document "<html></html>")
   [arg-map]
-  (tag= :html)
-  (set-content [:head [:title (:msg arg-map)]]))
+  [(tag= :html)
+   (set-content [:head [:title (:msg arg-map)]])])
 ```
 
 Selectors and Transformers
@@ -210,6 +211,15 @@ this with `or-ancestor`.
 selector that will select nodes for which the selector is satisfied either by
 themselves or an ancestor node.
 
+####CSS Selectors####
+
+The `tinsel.css` namespace has functions for converting from a css selector to
+a tinsel selector. As an example
+`(->tinsel-selector "div.foo > span.bar")` will create a tinsel selector that
+enforces the parent child relationship and matches on the span element. These
+functions are normal hiccup selectors and can be mixed/matched with other selectors
+using combinators. `(select (tag= :body) (->tinsel-selector "div.main"))`
+
 ###Transformers###
 
 A transformer is a function of a Hiccup vector that returns another Hiccup
@@ -226,8 +236,8 @@ the children of an HTML node.
 
 	(deftemplate untitle-template [[:html [:h1 "Some page title"]]]
 		[]
-		(tag= :h1)
-		(fn [node] (vector (first node) (second node))))
+        [(tag= :h1)
+		 (fn [node] (vector (first node) (second node)))])
 		
 		user> (untitle-template)
 		"<html><h1></h1></html>"
@@ -245,8 +255,8 @@ As an example, let's make a transformer to change the title of a page.
 
 	(deftemplate retitle-template [[:html [:h1 "Some page title"]]]
 		[new-title]
-		(tag= :h1)
-		(fn [node] (vector (first node) (second node) 'new-title)))
+        [(tag= :h1)
+		 (fn [node] (vector (first node) (second node) 'new-title))])
 		
 		user> (retitle-template "The new title")
 		"<html><h1>The new title</h1></html>"
@@ -327,7 +337,7 @@ Obtaining it
 
 You can add
 
-	[tinsel "0.4.0"]
+	[bookbub/tinsel "1.0.0"]
 
 to your project.clj, or whatever is equivalent in the build tool you use.
 

@@ -1,4 +1,4 @@
-(defproject bookbub/tinsel "0.4.1-SNAPSHOT"
+(defproject bookbub/tinsel "1.0.0-SNAPSHOT"
   :description "Selector-based templates with Hiccup."
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [hiccup "1.0.5"]

@@ -247,30 +247,32 @@
                     (apply-transform (first transform-list) form))))))
 
 (defmacro defsnippet
-  [tmpl-name source arg-list & transforms]
-  (let [source (if (utils/code-form? source) ;; Need to force eval if source is
-                 (eval source)               ;; not hiccup vectors.
-                 source)
-        source-forms (map utils/normalize-form ;; ["tag" {attrs} content...]
-                          source)
-        transforms (partition 2 (map eval transforms))
-        transformed-forms (apply-transforms transforms source-forms)]
-    `(defn ~tmpl-name
-       ~arg-list
-       ~@transformed-forms)))
+  ([tmpl-name source arg-list transforms]
+   (let [source (if (utils/code-form? source) ;; Need to force eval if source is
+                  (eval source)               ;; not hiccup vectors.
+                  source)
+         source-forms (map utils/normalize-form ;; ["tag" {attrs} content...]
+                           source)
+         transforms (if (utils/code-form? transforms) (eval transforms) transforms)
+         transforms (partition 2 (map eval transforms))
+         transformed-forms (apply-transforms transforms source-forms)]
+     `(defn ~tmpl-name
+        ~arg-list
+        ~@transformed-forms))))
 
 (defmacro deftemplate
-  [tmpl-name source arg-list & transforms]
-  (let [source (if (utils/code-form? source) ;; Need to force eval if source is
-                 (eval source)               ;; not hiccup vectors.
-                 source)
-        source-forms (map utils/normalize-form ;; ["tag" {attrs} content...]
-                          source)
-        transforms (partition 2 (map eval transforms))
-        transformed-forms (apply-transforms transforms source-forms)]
-    `(defn ~tmpl-name
-       ~arg-list
-       (html ~@transformed-forms))))
+  ([tmpl-name source arg-list transforms]
+   (let [source (if (utils/code-form? source) ;; Need to force eval if source is
+                  (eval source)               ;; not hiccup vectors.
+                  source)
+         source-forms (map utils/normalize-form ;; ["tag" {attrs} content...]
+                           source)
+         transforms (if (utils/code-form? transforms) (eval transforms) transforms)
+         transforms (partition 2 (map eval transforms))
+         transformed-forms (apply-transforms transforms source-forms)]
+     `(defn ~tmpl-name
+        ~arg-list
+        (html ~@transformed-forms)))))
 
 ;;
 ;; Template Loading

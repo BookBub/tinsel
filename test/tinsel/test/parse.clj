@@ -13,8 +13,8 @@
 
 (deftemplate html-template (html-document "<html></html>")
   [arg-map]
-  (tag= :html)
-  (set-content [:head [:title (:msg arg-map)]]))
+  [(tag= :html)
+   (set-content [:head [:title (:msg arg-map)]])])
 
 (deftest test-html-template
   (is (= "<html><head><title>Wow, that worked!</title></head></html>"
@@ -22,8 +22,8 @@
 
 (deftemplate hiccup-template [[:html]]
   [arg-map]
-  (tag= :html)
-  (set-content [:head [:title (:msg arg-map)]]))
+  [(tag= :html)
+   (set-content [:head [:title (:msg arg-map)]])])
 
 (deftest test-hiccup-template
   (is (= "<html><head><title>Wow, that worked!</title></head></html>"
@@ -34,8 +34,8 @@
 
 (deftemplate hiccup-template-in-var some-hiccup-src
   [arg-map]
-  (tag= :title)
-  (set-content (:title arg-map)))
+  [(tag= :title)
+   (set-content (:title arg-map))])
 
 (deftest test-hiccup-template-in-var
   (is (= "<html><head><title>TITLE</title></head></html>"
